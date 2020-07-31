@@ -15,6 +15,7 @@
   display: inline-block;
   cursor: pointer;
   border-radius: 6px;
+  min-width: 115px;
 }
 
 .dropdown__value:after {
@@ -43,6 +44,12 @@
   box-sizing: border-box;
   border-bottom: 1px solid gray;
   border-radius: 4px;
+}
+
+.dropdown__link:hover {
+  background-color: gray;
+  color: white;
+  transition: all 0.3s ease;
 }
 
 .dropdown__list_active {
