@@ -1,3 +1,84 @@
+const elControlFontsize = Array.from(document.querySelectorAll('.font-size'));
+const elControlColors = Array.from(document.querySelectorAll('.color'));
+const bookContent = document.querySelector('.book__content');
+const initialBookClass = bookContent.className;
+
+const bookContentStatus = {
+    fontSize: null,
+    color: null,
+    backgroundColor: null,
+};
+
+function updateControls(elem, activeClassName) {
+    for (child of elem.parentElement.children){
+        child.classList.remove(activeClassName);
+    }
+    elem.classList.add(activeClassName)
+}
+
+function updateBookContent() {
+    bookContent.className = initialBookClass;
+    for (let prop in bookContentStatus) {
+        if (bookContentStatus[prop]) {
+            bookContent.classList.add(bookContentStatus[prop]);
+        }
+    }
+}
+
+function setBookContent(elem) {
+    // Вот тут по красоте просится готовый объект, чтобы не плодить переменные, но ладно, и так сойдет ©
+    let classPrefix;
+    let property;
+    let dataName;
+    
+    // Вот тут по красоте просится готовый объект, чтобы не плодить переменные, но ладно, и так сойдет ©
+    if (elem.closest('.book__control_color')) {
+        classPrefix = 'book_color-';
+        property = 'color';
+        dataName = 'color';
+    } else if (elem.closest('.book__control_background')) {
+        classPrefix = 'book_bg-';
+        property = 'backgroundColor'
+        dataName = 'color';
+    } else if (elem.closest('.book__control_font-size')) {
+        classPrefix = 'book_fs-';
+        property = 'fontSize'
+        dataName = 'size';
+    }
+
+    if (elem.dataset[dataName]) {
+        bookContentStatus[property] = `${classPrefix}${elem.dataset[dataName]}`;
+    } else {
+        bookContentStatus[property] = null;
+    }
+
+}
+
+function bookControlClick(elem, activeClassName) {
+    elem.preventDefault();
+    updateControls(elem.target, activeClassName);
+    setBookContent(elem.target);
+    updateBookContent();
+}
+
+for (el of elControlColors) {
+    el.addEventListener('click', (e) => {bookControlClick(e, 'color_active')});
+}
+
+for (el of elControlFontsize) {
+    el.addEventListener('click', (e) => {bookControlClick(e, 'font-size_active')});
+}
+
+
+
+
+
+
+
+
+// *** Old Copy-Paste Version ***
+
+/*
 const elBookControlFontSize = document.querySelector('.book__control_font-size');
 const elBookControlColor = document.querySelector('.book__control_color');
 const elBookControlBgc = document.querySelector('.book__control_background');
@@ -62,9 +143,4 @@ elBookControlBgc.addEventListener('click', (e) => {
     }
 });
 
-/*
-Готово, но расстраивает дублирование
-Возможно стоит сделать объект со статусом области чтения
-По нажатям именно кнопок обновлять объект и отрисовку кнопок,
-а потом обновлять область чтения по объекту
 */
