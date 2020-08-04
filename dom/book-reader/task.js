@@ -54,10 +54,10 @@ function setBookContent(elem) {
 
 }
 
-function bookControlClick(elem, activeClassName) {
-    elem.preventDefault();
-    updateControls(elem.target, activeClassName);
-    setBookContent(elem.target);
+function bookControlClick(evt, activeClassName) {
+    evt.preventDefault();
+    updateControls(evt.target, activeClassName);
+    setBookContent(evt.target);
     updateBookContent();
 }
 
