@@ -14,22 +14,31 @@ class Game {
     this.reset();
     this.registerEvents();
   }
+/*
+  Q  
+  setTimer работает как ожидал.
+  Он устанавливает значение для свойства и отображает его на старнице,
+  а вот changeTimer не может прочитать это свойство.
+  
+  A
+  setInterval(this.changeTimer, 1000) - мы не можем передать просто this.changeTimer,
+  самый надёжный способ - сохранить контекст this и передавать в setInterval анонимную функцию
+  (занести this можно в переменную и байндить или использовать стрелочную функцию(рекомендую)).
+  https://developer.mozilla.org/ru/docs/Web/API/WindowOrWorkerGlobalScope/setInterval
+*/
 
-  // setTimer работает как ожидал.
-  // Он устанавливает значение для свойства и отображает его на старнице,
-  // а вот changeTimer не может прочитать это свойство.
-
-  // changeTimer() {
-  //   console.log(this.timerDuration);
-  //   // this.timerDuration--;
-  //   // this.timerElement.textContent = this.timerDuration;
-  // } 
-
-  // setTimer(word) {
-  //   this.timerDuration = word.length;
-  //   this.timerElement.textContent = this.timerDuration;
-  //   this.timer = setInterval(this.changeTimer, 1000);
-  // }
+  setTimer(word) {
+    clearInterval(this.timer);
+    this.timerDuration = word.length;
+    this.timerElement.textContent = this.timerDuration;
+    this.timer = setInterval(() => {
+      this.timerDuration--;
+      this.timerElement.textContent = this.timerDuration;
+      if (this.timerDuration === 0) {
+        this.fail();
+      } 
+    }, 1000);
+  }
   
   reset() {
     this.setNewWord();
@@ -74,7 +83,7 @@ class Game {
   setNewWord() {
     const word = this.getWord();
     this.renderWord(word);
-    // this.setTimer(word);
+    this.setTimer(word);
   }
 
   getWord() {
