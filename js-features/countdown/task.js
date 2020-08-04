@@ -7,8 +7,18 @@ function changeTimer() {
     elTimer.textContent = timeInSec;
     if (timeInSec === 0) {
         clearInterval(timer);
-        // Почему алерт срабатывает раньше чем на таймере выставляется '0'
-        alert('Вы победили в конкурсе!');
+        /*
+        Q
+        Почему алерт срабатывает раньше чем на таймере выставляется '0'
+        
+        A
+        Смена textContent происходит не моментально, в отличие от алерта,
+        который не только срабатывает быстрее, но и останавливает работу страницы на заднем фоне
+        (потому и не происходит смена на 0 на фоне)
+        Если обернуть алерт в setTimeout с задержкой в 0 мс то
+        html будет успевать измениться до вывода алерта
+        */
+        setTimeout(() => alert('Вы победили в конкурсе!'), 0);
         download('hello.txt', 'This is the content of file');
         //location.assign("http://image.sendsay.ru/image/rosaski/zip/2974931595919496/images/90121595840821120.png");
         
@@ -28,6 +38,7 @@ function download(filename, text) {
 
 // корректно использовать setTimeOut или setInterval для таких отсчетов,
 // Он ведь не точно 1000ms выдает. На больших промежутках времени будет накапливаться ошибка
+// A -- Некорректно!
 const timer = setInterval(changeTimer, 1000);
 
 
