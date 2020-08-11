@@ -33,7 +33,7 @@ function setParentStatus(parent) {
     parent.indeterminate = false;
     if (sum === 0) {
         parent.checked = false;
-    } else if (sum == childrens.length) {
+    } else if (sum === childrens.length) {
         parent.checked = true;
     } else {
         parent.indeterminate = true;
