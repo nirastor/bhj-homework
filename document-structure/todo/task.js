@@ -3,9 +3,21 @@ const elTaskList = document.getElementById('tasks__list');
 const elTaskInput = document.getElementById('task__input');
 const taskTemplate = document.getElementById('task-template').content.querySelector('.task');
 
-console.log(elButton, elTaskInput, elTaskList, taskTemplate);
+// initialize taskID
+let taskID = localStorage.getItem('nextTaskID');
+if (!taskID) {
+    taskID = 1;
+}
 
-function addTask(text) {
+// load tasks from storage
+if (taskID > 1) {
+    for (let i = 1; i < taskID; i++) {
+        addTask(localStorage.getItem(i), true, i);
+    }
+}
+
+
+function addTask(text, isLoad, id) {
     if (!text) {
         return;
     }
@@ -13,7 +25,7 @@ function addTask(text) {
     elTaskInput.value = '';
     
     const newTask = taskTemplate.cloneNode(true);
-    
+    newTask.dataset.taskid = id;
     const newTaskText = newTask.querySelector('.task__title');
     newTaskText.innerText = text;
     
@@ -21,18 +33,26 @@ function addTask(text) {
     newTaskClose.addEventListener('click', (e) => {
         e.preventDefault();
         newTask.remove();
+        localStorage.removeItem(id);
     });
     
     elTaskList.appendChild(newTask);
+    
+    // add task to local storage
+    if (!isLoad) {
+        localStorage.setItem(taskID, text);
+        taskID++
+        localStorage.setItem('nextTaskID', taskID)
+    }
 }
 
 elButton.addEventListener('click', (e) => {
     e.preventDefault();
-    addTask(elTaskInput.value);
+    addTask(elTaskInput.value, 0, taskID);
 });
 
 document.addEventListener('keydown', e => {
     if (e.key === 'Enter') {
-        addTask(elTaskInput.value);
+        addTask(elTaskInput.value, 0, taskID);
     }
 });
