@@ -1,7 +1,16 @@
 const products = Array.from(document.querySelectorAll('.product'));
-const elCart = document.querySelector('.cart__products');
+const elCart = document.querySelector('.cart');
+const elCartProducts = document.querySelector('.cart__products');
 const templateCart = document.getElementById('teplate-product-in-chart').content.querySelector('.cart__product');
-const inChart = [];
+let inChart = [];
+
+function showCart() {
+    if (inChart.length) {
+        elCart.classList.remove('cart--hide');
+    } else {
+        elCart.classList.add('cart--hide');
+    }
+}
 
 products.forEach(product => {
     const elProdDecButton = product.querySelector('.product__quantity-control_dec');
@@ -30,18 +39,31 @@ products.forEach(product => {
 
         if (ProdIsInChart) {
             ProdIsInChart.quantity = Number(ProdIsInChart.quantity) + quantity;
-            const productsInChart = Array.from(elCart.querySelectorAll('.cart__product'));
+            const productsInChart = Array.from(elCartProducts.querySelectorAll('.cart__product'));
             const product = productsInChart.find(item => item.dataset.id === id);
             product.querySelector('.cart__product-count').textContent = ProdIsInChart.quantity;
-            cons
         } else {
             const newProdInChart = templateCart.cloneNode(1);
             const elChartProductCount = newProdInChart.querySelector('.cart__product-count');
             newProdInChart.dataset.id = id;
             newProdInChart.querySelector('.cart__product-image').src = product.querySelector('.product__image').src;
             elChartProductCount.textContent = quantity;
-            elCart.appendChild(newProdInChart);
+            elCartProducts.appendChild(newProdInChart);
             inChart.push({id: id, quantity: quantity});
+
+            const elDeleteProduct = newProdInChart.querySelector('.cart__remove');
+            elDeleteProduct.addEventListener('click', (e) => {
+                e.preventDefault();
+                newProdInChart.remove();
+                const delId = elDeleteProduct.closest('.cart__product').dataset.id;
+                const indexInCartForDel = inChart.findIndex(item => item.id === id);
+                inChart.splice(indexInCartForDel, 1);
+                showCart();
+            })
         }
+
+        showCart();
     });
 });
+
+showCart();
