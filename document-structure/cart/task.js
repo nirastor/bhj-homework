@@ -1,44 +1,82 @@
 const products = Array.from(document.querySelectorAll('.product'));
 const elCart = document.querySelector('.cart');
 const elCartProducts = document.querySelector('.cart__products');
-const templateCart = document.getElementById('teplate-product-in-chart').content.querySelector('.cart__product');
-let inCart = [];
+let productsDb;
 
-function loadCartFromLocalStorage() {
-    for (let i = 1; i <= 4; i++) {
-        if (localStorage.getItem(i)) {
-            showNewProductInCart(i, localStorage.getItem(i), products[i-1]);
-        }
+function saveCart() {
+    localStorage.taskFishCart = JSON.stringify(productsDb);
+} 
+
+function getSavedCart() {
+    try {
+        return JSON.parse(localStorage.getItem('taskFishCart'));
+    } catch (e) {
+        return null;
     }
 }
 
-function showNewProductInCart(id, quantity, product) {
-    const newProdInCart = templateCart.cloneNode(1);
-    const elChartProductCount = newProdInCart.querySelector('.cart__product-count');
-    newProdInCart.dataset.id = id;
-    newProdInCart.querySelector('.cart__product-image').src = product.querySelector('.product__image').src;
-    elChartProductCount.textContent = quantity;
-    elCartProducts.appendChild(newProdInCart);
-    inCart.push({id: id, quantity: quantity});
+// Лучше сравнивать что пришло из хранилища, а что нашлось в html
+// но для этой задачи такой реализации достаточно
+function setProductsDb() {
+    productsDb = getSavedCart();
     
-    const elDeleteProduct = newProdInCart.querySelector('.cart__remove');
-    elDeleteProduct.addEventListener('click', (e) => {
-        e.preventDefault();
-        newProdInCart.remove();
-        const delId = elDeleteProduct.closest('.cart__product').dataset.id;
-        const indexInCartForDel = inCart.findIndex(item => item.id === id);
-        inCart.splice(indexInCartForDel, 1);
-        localStorage.removeItem(id);
-        showCart();
-    })
+    if (!productsDb) {
+        productsDb = [];
+        products.forEach(product => {
+            const id = Number(product.dataset.id);
+            const productImageSrc =  product.querySelector('.product__image').src;
+            productsDb.push({id: id, inCart: 0, src: productImageSrc});
+        });
+    }
+
+    console.log(productsDb);
 }
 
-function showCart() {
-    if (inCart.length) {
+function renderСhart() {
+    let productsInCart = '';
+
+    for (let product of productsDb) {
+        if (product.inCart !== 0) {
+            productsInCart += `
+            <div class="cart__product" data-id="${product.id}">
+                <img class="cart__product-image" src="${product.src}">
+                <div class="cart__product-count">${product.inCart}</div>
+                <div class="cart__remove">&times;</div>
+            </div>`;
+        }
+    }
+    
+    elCartProducts.innerHTML = productsInCart;
+
+    const elRemoves = Array.from(elCartProducts.querySelectorAll('.cart__remove'));
+    elRemoves.forEach(elRemove => {
+        elRemove.addEventListener('click', (e) => {
+            e.preventDefault();
+            removeFromCart( Number(elRemove.closest('.cart__product').dataset.id) );
+        });
+    });
+
+    if (productsInCart) {
         elCart.classList.remove('cart--hide');
     } else {
         elCart.classList.add('cart--hide');
     }
+}
+
+function getIndexById(id) {
+    return productsDb.findIndex(item => item.id == id);
+}
+
+function removeFromCart(id) {
+    productsDb[getIndexById(id)].inCart = 0;
+    saveCart();
+    renderСhart();
+}
+
+function addToCart(id, quantity) {
+    productsDb[getIndexById(id)].inCart += quantity;
+    saveCart();
+    renderСhart();
 }
 
 products.forEach(product => {
@@ -46,7 +84,8 @@ products.forEach(product => {
     const elProdIncButton = product.querySelector('.product__quantity-control_inc');
     const elProdAddButton = product.querySelector('.product__add');
     const elProdValue = product.querySelector('.product__quantity-value');
-
+    const id = Number(product.dataset.id);
+    
     elProdIncButton.addEventListener('click', (e) => {
         e.preventDefault();
         elProdValue.textContent = Number(elProdValue.textContent.trim()) + 1;
@@ -54,7 +93,7 @@ products.forEach(product => {
 
     elProdDecButton.addEventListener('click', (e) => {
         e.preventDefault();
-        let quantity = Number(elProdValue.textContent.trim());
+        const quantity = Number(elProdValue.textContent.trim());
         if (quantity > 1) {
             elProdValue.textContent = quantity - 1;
         }
@@ -62,24 +101,11 @@ products.forEach(product => {
 
     elProdAddButton.addEventListener('click', (e) => {
         e.preventDefault();
-        const id = product.dataset.id;
         const quantity = Number(elProdValue.textContent.trim());
-        const ProdIsInCart = inCart.find(item => item.id === id);
-
-        if (ProdIsInCart) {
-            ProdIsInCart.quantity = Number(ProdIsInCart.quantity) + quantity;
-            localStorage.setItem(id, Number(ProdIsInCart.quantity));
-            const productsInCart = Array.from(elCartProducts.querySelectorAll('.cart__product'));
-            const product = productsInCart.find(item => item.dataset.id === id);
-            product.querySelector('.cart__product-count').textContent = ProdIsInCart.quantity;
-        } else {
-            showNewProductInCart(id, quantity, product);
-            localStorage.setItem(id, quantity);
-        }
-
-        showCart();
+        // console.log(`add button for ${id}. quantity ${quantity}`);
+        addToCart(id, quantity);
     });
 });
 
-loadCartFromLocalStorage();
-showCart();
+setProductsDb();
+renderСhart();
