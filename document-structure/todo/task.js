@@ -3,29 +3,36 @@ const elTaskList = document.getElementById('tasks__list');
 const elTaskInput = document.getElementById('task__input');
 const taskTemplate = document.getElementById('task-template').content.querySelector('.task');
 
-// initialize taskID
-let taskID = localStorage.getItem('nextTaskID');
-if (!taskID) {
-    taskID = 1;
+// В целом хранением всего списка в одной строке даже упростило код
+// Удалось отказаться от параметра 'id задачи'
+
+// есть ли событие закрытие окна или браузера,
+// чтобы не вызывать saveTask после каждого изменения списка задач?
+function saveTasks() {
+    const tasks = Array.from(document.querySelectorAll('.task__title'));
+    const taskTitles = [];
+    tasks.forEach(item => {
+        // использовал encode-decode URI из следующих лекций, 
+        // чтобы код был устойчвым к символу ';' в содержании задачи
+        taskTitles.push(encodeURIComponent(item.textContent));
+    });
+    localStorage.todoListOfTasks = taskTitles.join(';')
 }
 
-// load tasks from storage
-if (taskID > 1) {
-    for (let i = 1; i < taskID; i++) {
-        addTask(localStorage.getItem(i), true, i);
+function loadTasks() {
+    const tasklist = localStorage.todoListOfTasks.split(';');
+    for (let task of tasklist) {
+        addTask(decodeURIComponent(task), 'isLoad');
     }
 }
 
-
-function addTask(text, isLoad, id) {
+function addTask(text, isLoad = false) {
     if (!text) {
         return;
     }
     
     elTaskInput.value = '';
-    
     const newTask = taskTemplate.cloneNode(true);
-    newTask.dataset.taskid = id;
     const newTaskText = newTask.querySelector('.task__title');
     newTaskText.innerText = text;
     
@@ -33,26 +40,28 @@ function addTask(text, isLoad, id) {
     newTaskClose.addEventListener('click', (e) => {
         e.preventDefault();
         newTask.remove();
-        localStorage.removeItem(id);
+        saveTasks();
     });
     
     elTaskList.appendChild(newTask);
     
-    // add task to local storage
+    // Возможно эта проверка не особо нужно, впринципе работает
+    // даже если выполять пересохранение каждый раз в процессе восстановления задач
+    // но кажется это глупо: несколько раз искать элемент и сохранть уже сохраненное
     if (!isLoad) {
-        localStorage.setItem(taskID, text);
-        taskID++
-        localStorage.setItem('nextTaskID', taskID)
+        saveTasks();
     }
 }
 
 elButton.addEventListener('click', (e) => {
     e.preventDefault();
-    addTask(elTaskInput.value, 0, taskID);
+    addTask(elTaskInput.value);
 });
 
 document.addEventListener('keydown', e => {
     if (e.key === 'Enter') {
-        addTask(elTaskInput.value, 0, taskID);
+        addTask(elTaskInput.value);
     }
 });
+
+loadTasks();
