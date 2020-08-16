@@ -28,8 +28,6 @@ function setProductsDb() {
             productsDb.push({id: id, inCart: 0, src: productImageSrc});
         });
     }
-
-    console.log(productsDb);
 }
 
 function renderСhart() {
