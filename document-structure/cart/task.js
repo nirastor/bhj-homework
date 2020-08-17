@@ -15,8 +15,8 @@ function getSavedCart() {
     }
 }
 
-// Лучше сравнивать что пришло из хранилища, а что нашлось в html
-// но для этой задачи такой реализации достаточно
+// Лучше сравнивать и сшивать что пришло из хранилища, а что нашлось в html
+// Но для этой задачи, где заранее известно, что html не меняется такой реализации достаточно
 function setProductsDb() {
     productsDb = getSavedCart();
     
@@ -100,7 +100,6 @@ products.forEach(product => {
     elProdAddButton.addEventListener('click', (e) => {
         e.preventDefault();
         const quantity = Number(elProdValue.textContent.trim());
-        // console.log(`add button for ${id}. quantity ${quantity}`);
         addToCart(id, quantity);
     });
 });
