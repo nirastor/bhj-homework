@@ -3,17 +3,10 @@ const elTaskList = document.getElementById('tasks__list');
 const elTaskInput = document.getElementById('task__input');
 const taskTemplate = document.getElementById('task-template').content.querySelector('.task');
 
-// В целом хранением всего списка в одной строке даже упростило код
-// Удалось отказаться от параметра 'id задачи'
-
-// есть ли событие закрытие окна или браузера,
-// чтобы не вызывать saveTask после каждого изменения списка задач?
 function saveTasks() {
     const tasks = Array.from(document.querySelectorAll('.task__title'));
     const taskTitles = [];
     tasks.forEach(item => {
-        // использовал encode-decode URI из следующих лекций, 
-        // чтобы код был устойчвым к символу ';' в содержании задачи
         taskTitles.push(encodeURIComponent(item.textContent));
     });
     localStorage.todoListOfTasks = taskTitles.join(';')
@@ -45,9 +38,9 @@ function addTask(text, isLoad = false) {
     
     elTaskList.appendChild(newTask);
     
-    // Возможно эта проверка не особо нужно, впринципе работает
-    // даже если выполять пересохранение каждый раз в процессе восстановления задач
-    // но кажется это глупо: несколько раз искать элемент и сохранть уже сохраненное
+    // Возможно эта проверка не особо нужна, 
+    // Все работает даже если выполнять сохранение каждый раз и во время восстановления задач
+    // Но кажется это глупо: несколько раз искать элемент и сохранять уже сохраненное
     if (!isLoad) {
         saveTasks();
     }
