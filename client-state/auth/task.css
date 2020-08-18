@@ -35,3 +35,12 @@ body {
 .welcome_active {
   display: block;
 }
+
+.btn-logout {
+  background: red;
+  display: none;
+}
+
+.btn-logout_active {
+  display: block;
+}
