@@ -3,11 +3,11 @@ const elSubscribeModalClose = elSubscribeModal.querySelector('.modal__close');
 
 elSubscribeModalClose.addEventListener('click', () => {
     elSubscribeModal.classList.remove('modal_active');
-    document.cookie = 'mynewcoocie=any; Expires=Mon, 31 Aug 2020 21:41:37 GMT';
+    document.cookie = 'modalwasshown=true; Expires=Mon, 31 Aug 2020 21:41:37 GMT';
 });
 
 function wasShowModal() {
-    return (";" + document.cookie).includes(';mynewcoocie=');
+    return ("; " + document.cookie).includes('; modalwasshown=');
 }
 
 function showSubscribeModal() {
@@ -16,4 +16,5 @@ function showSubscribeModal() {
     }
 }
 
+document.cookie = 'somefirstcoocie=first; Expires=Mon, 31 Aug 2020 21:41:37 GMT';
 showSubscribeModal();
